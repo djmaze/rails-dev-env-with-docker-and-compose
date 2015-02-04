@@ -1,7 +1,7 @@
 #!/bin/sh
 ruby_image=$(grep FROM Dockerfile | awk '{print $2}')
 commands="
-  gem install --no-document bundler --pre && \
+  gem install --no-ri --no-rdoc bundler --pre && \
   mkdir /root/.ssh && chmod 0700 /root/.ssh && ssh-keyscan -H github.com >>/root/.ssh/known_hosts && \
   cd /usr/src/app && exec bundle package --all"
 
