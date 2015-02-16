@@ -9,4 +9,4 @@ commands="
   mkdir /root/.ssh && chmod 0700 /root/.ssh && ssh-keyscan -H github.com >>/root/.ssh/known_hosts && \
   cd /usr/src/app && exec bundle package --all"
 
-sudo docker run --rm -v $(pwd):/usr/src/app -v $SSH_AUTH_SOCK:/tmp/ssh-auth-sock -e SSH_AUTH_SOCK=/tmp/ssh-auth-sock --entrypoint /bin/bash $ruby_image -c "$commands"
+docker run --rm -v $(pwd):/usr/src/app -v $SSH_AUTH_SOCK:/tmp/ssh-auth-sock -e SSH_AUTH_SOCK=/tmp/ssh-auth-sock --entrypoint /bin/bash $ruby_image -c "$commands"
