@@ -1,5 +1,9 @@
 #!/bin/sh
-ruby_image=$(grep FROM Dockerfile | awk '{print $2}')
+ruby_image=$1
+if [ -z "$ruby_image" ]; then ruby_image=$(grep FROM Dockerfile | awk '{print $2}'); fi
+
+echo Using image "$ruby_image"
+
 commands="
   gem install --no-ri --no-rdoc bundler --pre && \
   mkdir /root/.ssh && chmod 0700 /root/.ssh && ssh-keyscan -H github.com >>/root/.ssh/known_hosts && \
