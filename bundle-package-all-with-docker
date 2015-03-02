@@ -1,12 +1,24 @@
 #!/bin/sh
 ruby_image=$1
 if [ -z "$ruby_image" ]; then ruby_image=$(grep FROM Dockerfile | awk '{print $2}'); fi
+builder_image=$(echo $ruby_image | sed 's/:/-with-bundler:/' -)
 
-echo Using image "$ruby_image"
+echo Using image "$ruby_image" with builder image "$builder_image"
 
 commands="
   gem install --no-ri --no-rdoc bundler --pre && \
-  mkdir /root/.ssh && chmod 0700 /root/.ssh && ssh-keyscan -H github.com >>/root/.ssh/known_hosts && \
-  cd /usr/src/app && exec bundle package --all"
+  mkdir /root/.ssh && chmod 0700 /root/.ssh && ssh-keyscan -H github.com >>/root/.ssh/known_hosts"
 
-docker run --rm -v $(pwd):/usr/src/app -v $SSH_AUTH_SOCK:/tmp/ssh-auth-sock -e SSH_AUTH_SOCK=/tmp/ssh-auth-sock --entrypoint /bin/bash $ruby_image -c "$commands"
+docker inspect $builder_image >/dev/null 2>&1
+if [ $? -eq 0 ]; then
+  echo Using image $builder_image
+else
+  echo Building image $builder_image..
+  cid=$(docker run -d --entrypoint /bin/bash $ruby_image -c "$commands")
+  docker wait $cid
+  docker commit $cid $builder_image
+fi
+
+echo Bundling..
+
+docker run --rm -v $(pwd):/usr/src/app -v $SSH_AUTH_SOCK:/tmp/ssh-auth-sock -e SSH_AUTH_SOCK=/tmp/ssh-auth-sock --entrypoint /bin/bash $builder_image -c "cd /usr/src/app && exec bundle package --all"
