@@ -2,18 +2,19 @@
 ruby_image=$1
 if [ -z "$ruby_image" ]; then ruby_image=$(grep FROM Dockerfile | awk '{print $2}'); fi
 builder_image=$(echo $ruby_image | sed 's/:/-with-bundler:/' -)
+packages_needed_for_bundling=$(cat .packages_needed_for_bundling)
 
-echo Using image "$ruby_image" with builder image "$builder_image"
-
-commands="
-  gem install --no-ri --no-rdoc bundler --pre && \
-  mkdir /root/.ssh && chmod 0700 /root/.ssh && ssh-keyscan -H github.com >>/root/.ssh/known_hosts"
+echo Using image $ruby_image
 
 docker inspect $builder_image >/dev/null 2>&1
 if [ $? -eq 0 ]; then
   echo Using image $builder_image
 else
-  echo Building image $builder_image..
+  echo Building image $builder_image with packages: $packages_needed_for_bundling
+  commands="
+    apt-get update && apt-get -y install $packages_needed_for_bundling && \
+    gem install --no-ri --no-rdoc bundler --pre && \
+    mkdir /root/.ssh && chmod 0700 /root/.ssh && ssh-keyscan -H github.com >>/root/.ssh/known_hosts"
   cid=$(docker run -d --entrypoint /bin/bash $ruby_image -c "$commands")
   docker wait $cid
   docker commit $cid $builder_image
