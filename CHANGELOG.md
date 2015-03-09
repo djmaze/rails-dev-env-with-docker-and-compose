@@ -1,3 +1,7 @@
+## 0.2.1
+
+* Fix: ENV variables are now correctly forwarded when running fig / docker-compose
+
 ## 0.2.0
 
 * Add a `-run-with-agent` command for `docker-compose`
