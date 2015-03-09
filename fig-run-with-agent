@@ -3,5 +3,5 @@ set -e
 
 touch ssh-auth-sock &&
   sudo mount --bind $SSH_AUTH_SOCK ssh-auth-sock &&
-  sudo fig run -e SSH_AUTH_SOCK=ssh-auth-sock $*
+  sudo -E fig run -e SSH_AUTH_SOCK=ssh-auth-sock $*
 sudo umount ssh-auth-sock
