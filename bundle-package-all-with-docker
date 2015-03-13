@@ -22,4 +22,4 @@ fi
 
 echo Bundling..
 
-docker run --rm -v $(pwd):/usr/src/app -v $SSH_AUTH_SOCK:/tmp/ssh-auth-sock -e SSH_AUTH_SOCK=/tmp/ssh-auth-sock --entrypoint /bin/bash $builder_image -c "cd /usr/src/app && exec bundle package --all"
+docker run --rm -v $(pwd):/usr/src/app -v $SSH_AUTH_SOCK:/tmp/ssh-auth-sock -e SSH_AUTH_SOCK=/tmp/ssh-auth-sock --entrypoint /bin/bash $builder_image -c "cd /usr/src/app && exec bundle package --all --no-install"
