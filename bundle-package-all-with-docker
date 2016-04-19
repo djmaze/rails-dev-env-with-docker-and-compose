@@ -13,7 +13,7 @@ else
   echo Building image $builder_image with packages: $packages_needed_for_bundling
   commands="
     apt-get update && apt-get -y install git $packages_needed_for_bundling && \
-    gem install --no-ri --no-rdoc bundler --pre && \
+    gem install --no-ri --no-rdoc bundler && \
     mkdir /root/.ssh && chmod 0700 /root/.ssh && ssh-keyscan -H github.com >>/root/.ssh/known_hosts"
   cid=$(docker run -d --entrypoint /bin/bash $ruby_image -c "$commands")
   docker wait $cid
