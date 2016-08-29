@@ -10,7 +10,7 @@ Copy / symlink these scripts to somewhere in your `PATH`.
 
 * In your project directory, fetch all gems one-time:
 
-      bundle-package-all-with-docker
+        bundle-package-all-with-docker
 
 * Then do a `docker build` as usual.
 
