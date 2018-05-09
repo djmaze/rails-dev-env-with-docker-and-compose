@@ -1,8 +1,0 @@
-#!/bin/sh
-set -e
-
-trap "sudo umount ssh-auth-sock" EXIT
-
-touch ssh-auth-sock &&
-  sudo mount --bind $SSH_AUTH_SOCK ssh-auth-sock &&
-  sudo -E docker-compose run -e SSH_AUTH_SOCK=/usr/src/app/ssh-auth-sock $*

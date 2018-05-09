@@ -1,17 +1,30 @@
-#!/bin/sh
+#!/bin/bash
+set -e
+
+fail() {
+  declare message="$1"
+  echo "$message"
+
+  exit 1
+}
+
 ruby_image=$1
-if [ -z "$ruby_image" ]; then ruby_image=$(grep FROM Dockerfile | awk '{print $2}'); fi
+if [[ -z "$ruby_image" ]]; then
+  [[ -e Dockerfile ]] || fail "Could't find Dockerfile"
+  ruby_image=$(grep FROM Dockerfile | awk '{print $2}')
+  [[ -z "$ruby_image" ]] && fail "Ruby base image is not used"
+fi
 builder_image=$(echo $ruby_image | sed 's/:/-with-bundler:/' -)
-packages_needed_for_bundling=$(cat .packages_needed_for_bundling)
+packages_needed_for_bundling="$(cat .packages_needed_for_bundling 2>/dev/null || true)"
 
-echo Using image $ruby_image
+echo Project uses image $ruby_image
 
-docker inspect $builder_image >/dev/null 2>&1
-if [ $? -eq 0 ]; then
+docker inspect $builder_image >/dev/null 2>&1 || rc=$?
+if [[ $rc -eq 0 ]]; then
   echo Using image $builder_image
 else
   echo Building image $builder_image with packages: $packages_needed_for_bundling
-  commands="
+  commands=" \
     apt-get update && apt-get -y install git $packages_needed_for_bundling && \
     gem install --no-ri --no-rdoc bundler && \
     mkdir /root/.ssh && chmod 0700 /root/.ssh && ssh-keyscan -H github.com >>/root/.ssh/known_hosts"
@@ -22,4 +35,5 @@ fi
 
 echo Bundling..
 
-docker run --rm -v $(pwd):/usr/src/app -v $SSH_AUTH_SOCK:/tmp/ssh-auth-sock -e SSH_AUTH_SOCK=/tmp/ssh-auth-sock --entrypoint /bin/bash $builder_image -c "cd /usr/src/app && exec bundle package --all --no-install"
+ssh_auth_sock_opts="$(which pinata-ssh-mount 2>1 1>/dev/null && pinata-ssh-mount || true)"
+docker run --rm -v $(pwd):/usr/src/app ${ssh_auth_sock_opts} --entrypoint /bin/bash $builder_image -c "cd /usr/src/app && exec bundle package --all --no-install"

@@ -1,6 +1,10 @@
 ## Installation
 
-Copy / symlink these scripts to somewhere in your `PATH`.
+* Optionally, install [docker-ssh-agent-forward](https://github.com/djmaze/docker-ssh-agent-forward) if you need to install private gems or deploy via SSH.
+* Copy the script [bundle-package-all-with-docker](bundle-package-all-with-docker) into your path:
+
+      curl -sL https://github.com/djmaze/rails-dev-env-with-docker-and-compose/raw/master/bundle-package-all-with-docker | sudo tee /usr/local/bin/bundle-package-all-with-docker 1>/dev/null
+      sudo chmod +x /usr/local/bin/bundle-package-all-with-docker
 
 ## Getting started with an existing app
 
