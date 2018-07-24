@@ -14,7 +14,7 @@ if [[ -z "$ruby_image" ]]; then
   ruby_image=$(grep FROM Dockerfile | awk '{print $2}')
   [[ -z "$ruby_image" ]] && fail "Ruby base image is not used"
 fi
-builder_image=$(echo $ruby_image | sed 's/:/-with-bundler:/' -)
+builder_image=$(echo $ruby_image | sed 's/:/-with-bundler:/')
 packages_needed_for_bundling="$(cat .packages_needed_for_bundling 2>/dev/null || true)"
 
 echo Project uses image $ruby_image
