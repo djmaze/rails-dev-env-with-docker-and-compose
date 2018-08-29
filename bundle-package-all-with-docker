@@ -35,5 +35,5 @@ fi
 
 echo Bundling..
 
-ssh_auth_sock_opts="$(which pinata-ssh-mount 2>1 1>/dev/null && pinata-ssh-mount || true)"
+ssh_auth_sock_opts="$(which pinata-ssh-mount 2>&1 1>/dev/null && pinata-ssh-mount || true)"
 docker run --rm -v $(pwd):/usr/src/app ${ssh_auth_sock_opts} --entrypoint /bin/bash $builder_image -c "cd /usr/src/app && exec bundle package --all --no-install"
